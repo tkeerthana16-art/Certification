@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NASSCOM Certificate Submission — Sona College of Technology</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --primary: #1a3c6e; --accent: #e8a020; --green: #16a34a;
+  --bg: #f5f7fb; --card: #fff; --border: #e2e8f0;
+  --text: #1a202c; --muted: #64748b; --error: #dc2626;
+  --radius: 12px; --shadow: 0 4px 24px rgba(26,60,110,0.09);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+#no-conn-banner { display:none; background:#fef3c7; border-bottom:2px solid #f59e0b; padding:10px 18px; text-align:center; font-size:12.5px; color:#92400e; font-weight:600; }
+#no-conn-banner.show { display:block; }
+
+header { background:var(--primary); position:relative; overflow:hidden; }
+header::before { content:''; position:absolute; top:-50px; right:-50px; width:220px; height:220px; border-radius:50%; background:rgba(232,160,32,0.12); }
+.hinner { max-width:680px; margin:0 auto; padding:24px 18px 18px; position:relative; z-index:1; display:flex; align-items:center; gap:14px; }
+.hlogo { width:48px; height:48px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:21px; flex-shrink:0; box-shadow:0 4px 14px rgba(232,160,32,0.3); }
+.htxt h1 { font-family:'Playfair Display',serif; font-size:clamp(15px,4vw,19px); color:#fff; line-height:1.25; }
+.htxt p  { margin-top:3px; font-size:11.5px; color:rgba(255,255,255,0.58); }
+.nasscom-tag { display:inline-block; margin-top:6px; background:var(--accent); color:#fff; font-size:9.5px; font-weight:700; letter-spacing:1px; padding:2px 8px; border-radius:20px; text-transform:uppercase; }
+.conn-pill { margin-left:auto; flex-shrink:0; display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.10); border:1px solid rgba(255,255,255,0.18); border-radius:20px; padding:5px 11px; font-size:10.5px; font-weight:600; color:rgba(255,255,255,0.65); }
+.cdot { width:7px; height:7px; border-radius:50%; background:#f87171; flex-shrink:0; }
+.cdot.on { background:#4ade80; box-shadow:0 0 0 3px rgba(74,222,128,0.22); }
+
+.prog-wrap { max-width:680px; margin:0 auto; padding:0 18px 16px; background:var(--primary); }
+.steps-row { display:flex; align-items:center; }
+.step-dot { display:flex; flex-direction:column; align-items:center; gap:4px; flex:1; }
+.dot { width:26px; height:26px; border-radius:50%; background:rgba(255,255,255,0.10); border:2px solid rgba(255,255,255,0.17); display:flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:700; color:rgba(255,255,255,0.35); transition:all 0.3s; }
+.dot.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+.dot.done   { background:var(--green);  border-color:var(--green);  color:#fff; }
+.slbl { font-size:9px; color:rgba(255,255,255,0.38); font-weight:500; }
+.slbl.on { color:var(--accent); }
+.sline { flex:1; height:2px; background:rgba(255,255,255,0.12); margin-bottom:12px; transition:background 0.3s; }
+.sline.done { background:var(--green); }
+
+.card-wrap { max-width:680px; margin:20px auto 40px; padding:0 14px; }
+.card { background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:24px 20px; border:1px solid var(--border); }
+.sec-title { font-size:14.5px; font-weight:700; color:var(--primary); margin-bottom:15px; display:flex; align-items:center; gap:8px; }
+.sec-title .ico { width:30px; height:30px; border-radius:7px; background:#eef2fb; display:flex; align-items:center; justify-content:center; font-size:15px; }
+.field { margin-bottom:14px; }
+label { display:block; font-size:12px; font-weight:600; color:var(--primary); margin-bottom:5px; }
+label .req { color:var(--error); margin-left:2px; }
+input[type="text"], input[type="url"], input[type="date"], input[type="number"], select {
+  width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px;
+  font-size:13.5px; font-family:'DM Sans',sans-serif; color:var(--text); background:#fff;
+  outline:none; transition:border-color 0.2s, box-shadow 0.2s; -webkit-appearance:none; appearance:none;
+}
+input:focus, select:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(26,60,110,0.08); }
+input.err, select.err { border-color:var(--error); }
+.emsg { font-size:11px; color:var(--error); margin-top:4px; display:none; }
+.emsg.show { display:block; }
+.hint-info { font-size:11.5px; color:#92400e; margin-top:6px; background:#fef9ec; border-left:3px solid var(--accent); padding:7px 10px; border-radius:0 6px 6px 0; line-height:1.5; }
+.sel-wrap { position:relative; }
+.sel-wrap::after { content:'▾'; position:absolute; right:11px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none; font-size:12px; }
+.g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+@media(max-width:480px){ .g3{grid-template-columns:1fr;} .card{padding:18px 14px;} }
+.divider { border:none; border-top:1.5px solid var(--border); margin:18px 0; }
+
+.acc-section { margin-bottom:12px; border:1.5px solid var(--border); border-radius:var(--radius); overflow:hidden; transition:border-color 0.2s; }
+.acc-section:has(.acc-body.open) { border-color: #bfdbfe; }
+.acc-header { display:flex; align-items:center; gap:12px; padding:14px 16px; cursor:pointer; user-select:none; transition:background 0.15s; background:#fafbff; }
+.acc-header:hover { background:#f0f4ff; }
+.acc-icon  { font-size:20px; }
+.acc-label { font-size:14.5px; font-weight:700; color:var(--primary); flex:1; }
+.acc-count { font-size:11px; background:#eef2fb; color:var(--primary); padding:2px 8px; border-radius:20px; font-weight:700; }
+.acc-chev  { font-size:18px; color:var(--muted); transition:transform 0.25s; }
+.acc-chev.open { transform:rotate(90deg); }
+.acc-body  { display:none; padding:16px; border-top:1.5px solid var(--border); }
+.acc-body.open { display:block; }
+
+.item-block { background:#f8faff; border:1.5px solid #dde8f8; border-radius:10px; margin-bottom:12px; overflow:hidden; }
+.item-block-header { display:flex; align-items:center; gap:10px; padding:11px 14px; cursor:pointer; font-size:13px; font-weight:700; color:var(--primary); transition:background 0.15s; }
+.item-block-header:hover { background:#eef4ff; }
+.item-block-chev { margin-left:auto; font-size:16px; color:var(--muted); transition:transform 0.2s; }
+.item-block-chev.open { transform:rotate(90deg); }
+.item-fields { display:none; padding:12px 14px; border-top:1.5px solid #dde8f8; }
+.item-fields.open { display:block; }
+.item-field { margin-bottom:12px; }
+
+#loading { text-align:center; padding:40px 20px; color:var(--muted); }
+.spin-lg { width:34px; height:34px; border:3px solid var(--border); border-top-color:var(--primary); border-radius:50%; animation:rot 0.8s linear infinite; margin:0 auto 12px; }
+@keyframes rot { to{transform:rotate(360deg)} }
+
+.btn-sub { width:100%; padding:13px; background:var(--primary); color:#fff; border:none; border-radius:9px; font-size:14.5px; font-weight:700; font-family:'DM Sans',sans-serif; cursor:pointer; transition:background 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+.btn-sub:hover { background:#142f57; }
+.btn-sub:disabled { background:#94a3b8; cursor:not-allowed; }
+.spin { width:16px; height:16px; border:2.5px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:rot 0.7s linear infinite; display:none; }
+
+#success-screen { display:none; text-align:center; padding:10px 0; }
+.s-ico { width:64px; height:64px; border-radius:50%; background:#dcfce7; margin:0 auto 14px; display:flex; align-items:center; justify-content:center; font-size:30px; animation:bnc 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes bnc { from{transform:scale(0)} to{transform:scale(1)} }
+#success-screen h2 { font-size:19px; font-weight:700; color:var(--primary); margin-bottom:6px; }
+#success-screen p  { font-size:13px; color:var(--muted); }
+.s-det { background:#f0fdf4; border:1.5px solid #86efac; border-radius:10px; padding:12px 15px; margin:14px 0; font-size:12.5px; color:#166534; text-align:left; line-height:1.8; }
+.s-det b { color:#14532d; }
+.btn-again { padding:10px 22px; background:transparent; border:2px solid var(--primary); border-radius:9px; color:var(--primary); font-size:13px; font-weight:700; font-family:'DM Sans',sans-serif; cursor:pointer; transition:all 0.2s; }
+.btn-again:hover { background:var(--primary); color:#fff; }
+
+.toast { position:fixed; bottom:18px; left:50%; transform:translateX(-50%) translateY(60px); background:#1e293b; color:#fff; padding:10px 18px; border-radius:30px; font-size:12.5px; font-weight:500; z-index:2000; transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1); white-space:nowrap; box-shadow:0 8px 24px rgba(0,0,0,0.2); pointer-events:none; }
+.toast.show { transform:translateX(-50%) translateY(0); }
+.toast.red   { background:#991b1b; }
+.toast.green { background:#166534; }
+footer { text-align:center; padding:14px; font-size:11px; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<div id="no-conn-banner">
+  ⚠️ This portal has not been configured yet. Please contact your administrator.
+</div>
+
+<header>
+  <div class="hinner">
+    <div class="hlogo">🎓</div>
+    <div class="htxt">
+      <h1>Sona College of Technology</h1>
+      <p>Student Achievement &amp; Certificate Submission Portal</p>
+      <span class="nasscom-tag">Department of Training</span>
+    </div>
+    <div class="conn-pill">
+      <div class="cdot" id="cdot"></div>
+      <span id="clbl">Not connected</span>
+    </div>
+  </div>
+  <div class="prog-wrap">
+    <div class="steps-row">
+      <div class="step-dot"><div class="dot active" id="d1">1</div><div class="slbl on" id="l1">Identity</div></div>
+      <div class="sline" id="ln1"></div>
+      <div class="step-dot"><div class="dot" id="d2">2</div><div class="slbl" id="l2">Details</div></div>
+      <div class="sline" id="ln2"></div>
+      <div class="step-dot"><div class="dot" id="d3">3</div><div class="slbl" id="l3">Submit</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="card-wrap">
+  <div class="card">
+    <div id="form-sec">
+      <div class="sec-title"><span class="ico">👤</span>Student Details</div>
+
+      <!-- Name is optional — not used for lookup, not validated -->
+      <div class="field">
+        <label>Full Name <span style="font-weight:400;color:var(--muted);font-size:11px;">(optional)</span></label>
+        <input type="text" id="f-name" placeholder="Enter your full name"/>
+      </div>
+
+      <!-- Register Number is the ONLY identifier used to find the student row -->
+      <div class="field">
+        <label>Register Number <span class="req">*</span></label>
+        <input type="text" id="f-regno" placeholder="e.g. 61782324101004" style="text-transform:uppercase"/>
+        <div class="emsg" id="e-regno">Please enter your register number</div>
+        <div class="hint-info">
+          ⚠️ Enter your register number <strong>exactly</strong> as in college records (e.g. 61782324101004).
+          Incorrect entries will not be saved to your record.
+        </div>
+      </div>
+
+      <div class="g3">
+        <div class="field">
+          <label>Department <span class="req">*</span></label>
+          <div class="sel-wrap"><select id="f-dept">
+            <option value="">Select</option>
+            <option>CSE</option><option>ECE</option><option>IT</option>
+            <option>MECH</option><option>CIVIL</option><option>EEE</option>
+            <option>ADS</option><option>AIML</option><option>CSD</option><option>MCT</option><option>EFE</option>    <option>EXE</option><option>BME</option><option>FT</option>
+          </select></div>
+          <div class="emsg" id="e-dept">Select dept</div>
+        </div>
+        <div class="field">
+          <label>Year <span class="req">*</span></label>
+          <div class="sel-wrap"><select id="f-year" onchange="onYearChange(this.value)">
+            <option value="">Select</option>
+            <option value="I">I</option>
+            <option value="II">II</option>
+            <option value="III">III</option>
+            <option value="IV">IV</option>
+          </select></div>
+          <div class="emsg" id="e-year">Select year</div>
+        </div>
+        <div class="field">
+          <label>Section <span class="req">*</span></label>
+          <div class="sel-wrap"><select id="f-section">
+            <option value="">Select</option>
+            <option>A</option><option>B</option><option>C</option><option>D</option>
+          </select></div>
+          <div class="emsg" id="e-sect">Select section</div>
+        </div>
+      </div>
+
+      <hr class="divider"/>
+      <div id="dynamic-sections">
+        <div id="loading"><div class="spin-lg"></div><p>Loading form…</p></div>
+      </div>
+      <hr class="divider"/>
+
+      <button class="btn-sub" id="sub-btn" onclick="handleSubmit()">
+        <div class="spin" id="spin"></div>
+        <span id="btxt">Submit Details &nbsp;→</span>
+      </button>
+    </div>
+
+    <div id="success-screen">
+      <div class="s-ico">✅</div>
+      <h2>Submitted Successfully!</h2>
+      <p>Your details have been saved to your class record.</p>
+      <div class="s-det" id="s-det"></div>
+      <button class="btn-again" onclick="resetForm()">Submit Another Entry</button>
+    </div>
+  </div>
+</div>
+
+<footer>Sona College of Technology &nbsp;·&nbsp; NASSCOM Student Portal &nbsp;·&nbsp; 2025</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────
+//  Reads the batch→URL map saved by admin.html (nasscom_sheets).
+//  Students just open this page and pick their Year — no setup needed.
+// ─────────────────────────────────────────────────────────────────
+const savedSheets = JSON.parse(localStorage.getItem('nasscom_sheets') || '[]');
+// Map label → url (e.g. "I Year" → "https://script…")
+const SHEET_MAP = {};
+savedSheets.forEach(s => { if (s.label && s.url) SHEET_MAP[s.label] = s.url; });
+
+let API    = '';
+let CONFIG = null;
+
+window.addEventListener('DOMContentLoaded', () => {
+  const anyConfigured = savedSheets.some(s => s.url);
+  if (anyConfigured) {
+    document.getElementById('no-conn-banner').style.display = 'none';
+  } else {
+    document.getElementById('no-conn-banner').style.display = 'block';
+    document.getElementById('sub-btn').disabled = true;
+  }
+  document.getElementById('loading').innerHTML =
+    '<p style="color:var(--muted);font-size:13px;text-align:center;">👆 Select your Year above to load the form.</p>';
+});
+
+function onYearChange(val) {
+  updateProg();
+  if (!val) {
+    document.getElementById('dynamic-sections').innerHTML =
+      '<p style="color:var(--muted);font-size:13px;text-align:center;">👆 Select your Year above.</p>';
+    API = ''; setConn(false); CONFIG = null;
+    return;
+  }
+  // Match "I" → "I Year", "II" → "II Year" etc.
+  const url = SHEET_MAP[val + ' Year'] || SHEET_MAP[val] || '';
+  if (!url) {
+    document.getElementById('dynamic-sections').innerHTML =
+      '<p style="color:#dc2626;font-size:13px;text-align:center;">⚠️ This year is not configured yet. Contact your administrator.</p>';
+    API = ''; setConn(false); CONFIG = null;
+    return;
+  }
+  API = url;
+  setConn(true);
+  loadConfig();
+}
+
+function setConn(yes) {
+  document.getElementById('cdot').className = 'cdot' + (yes ? ' on' : '');
+  document.getElementById('clbl').textContent = yes ? 'Connected ✓' : 'Not connected';
+}
+
+async function loadConfig() {
+  try {
+    const res = await fetch(API + '?action=getConfig');
+    const d   = await res.json();
+    if (d.status !== 'ok') throw new Error(d.message);
+    CONFIG = d.config;
+    renderSections();
+  } catch(e) {
+    document.getElementById('loading').innerHTML =
+      `<p style="color:var(--error);font-size:13px;text-align:center;">❌ ${e.message}</p>`;
+  }
+}
+
+function renderSections() {
+  const c = document.getElementById('dynamic-sections');
+  if (!CONFIG?.sections?.length) {
+    c.innerHTML = '<p style="color:var(--muted);font-size:13px;">No sections found.</p>';
+    return;
+  }
+  c.innerHTML = CONFIG.sections.map((sec, si) => `
+    <div class="acc-section">
+      <div class="acc-header" onclick="toggleAcc('ab${si}','ac${si}')">
+        <span class="acc-icon">${sec.icon||'📁'}</span>
+        <span class="acc-label">${sec.label}</span>
+        <span class="acc-count">${sec.items?.length||0} item(s)</span>
+        <span class="acc-chev" id="ac${si}">›</span>
+      </div>
+      <div class="acc-body" id="ab${si}">
+        ${(sec.items||[]).map((item,ii)=>`
+          <div class="item-block">
+            <div class="item-block-header" onclick="toggleItem('if${si}${ii}','ic${si}${ii}')">
+              📌 ${item.label||'Item'}
+              <span class="item-block-chev" id="ic${si}${ii}">›</span>
+            </div>
+            <div class="item-fields" id="if${si}${ii}">
+              ${(item.fields||[]).map((f,fi)=>`
+                <div class="item-field">
+                  <label>${f.label||'Field'}</label>
+                  ${f.type==='select'&&f.options?.length
+                    ? `<div class="sel-wrap"><select id="fv${si}${ii}${fi}"><option value="">Select…</option>${f.options.map(o=>`<option>${o}</option>`).join('')}</select></div>`
+                    : `<input type="${f.type==='url'?'url':f.type==='date'?'date':f.type==='number'?'number':'text'}" id="fv${si}${ii}${fi}" placeholder="${f.type==='url'?'Paste Drive/OneDrive link':'Enter '+(f.label||'value')}"/>`
+                  }
+                </div>`).join('')}
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function toggleAcc(bid, cid) {
+  document.getElementById(bid)?.classList.toggle('open');
+  document.getElementById(cid)?.classList.toggle('open');
+  updateProg();
+}
+function toggleItem(bid, cid) {
+  document.getElementById(bid)?.classList.toggle('open');
+  document.getElementById(cid)?.classList.toggle('open');
+}
+
+function updateProg() {
+  const g  = id => (document.getElementById(id)?.value || '').trim();
+  // Name is optional — only regno, dept, year, section count for step 1
+  const s1 = !!(g('f-regno') && g('f-dept') && g('f-year') && g('f-section'));
+  const s2 = !!document.querySelector('.acc-body.open');
+  setDot(1, s1 ? 'done' : 'active');
+  setDot(2, s2 ? (s1 ? 'done' : 'active') : (s1 ? 'active' : ''));
+  setDot(3, '');
+  document.getElementById('ln1').classList.toggle('done', !!(s1 && s2));
+}
+function setDot(n, st) {
+  const d = document.getElementById('d'+n), l = document.getElementById('l'+n);
+  d.className = 'dot' + (st==='active'?' active':st==='done'?' done':'');
+  l.className = 'slbl' + (st ? ' on' : '');
+  d.textContent = st==='done' ? '✓' : n;
+}
+
+// Listen to verified fields only (name excluded)
+['f-regno','f-dept','f-year','f-section'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input',  updateProg);
+  document.getElementById(id)?.addEventListener('change', updateProg);
+});
+
+// ── VALIDATION: name is NOT required ────────────────────────────
+function validate() {
+  let ok = true;
+  [
+    ['f-regno',  'e-regno', v => v.length > 2],
+    ['f-dept',   'e-dept',  v => v !== ''],
+    ['f-year',   'e-year',  v => v !== ''],
+    ['f-section','e-sect',  v => v !== '']
+  ].forEach(([id, eid, fn]) => {
+    const el   = document.getElementById(id);
+    const em   = document.getElementById(eid);
+    const pass = fn(el.value.trim());
+    el.classList.toggle('err', !pass);
+    em?.classList.toggle('show', !pass);
+    if (!pass) ok = false;
+  });
+  return ok;
+}
+
+function collectData() {
+  const data = {};
+  if (!CONFIG) return data;
+  CONFIG.sections.forEach((sec, si) => {
+    (sec.items||[]).forEach((item, ii) => {
+      (item.fields||[]).forEach((f, fi) => {
+        const el  = document.getElementById(`fv${si}${ii}${fi}`);
+        const val = el?.value?.trim();
+        if (val && f.col) data[f.col] = val;
+      });
+    });
+  });
+  return data;
+}
+
+async function handleSubmit() {
+  if (!validate()) return;
+  const data = collectData();
+  if (!Object.keys(data).length) { toast('Please fill at least one field', 'red'); return; }
+  const btn = document.getElementById('sub-btn');
+  const sp  = document.getElementById('spin');
+  const tx  = document.getElementById('btxt');
+  btn.disabled = true; sp.style.display = 'block'; tx.textContent = 'Submitting…';
+  const payload = {
+    action:  'submitStudent',
+    name:    document.getElementById('f-name').value.trim() || '(not provided)',
+    regno:   document.getElementById('f-regno').value.trim().toUpperCase(),
+    dept:    document.getElementById('f-dept').value,
+    year:    document.getElementById('f-year').value,
+    section: document.getElementById('f-section').value,
+    data
+  };
+  try {
+    const res  = await fetch(API, { method:'POST', body:JSON.stringify(payload) });
+    const resp = await res.json();
+    if (resp.status !== 'ok') throw new Error(resp.message);
+    showSuccess(payload, Object.keys(data).length);
+  } catch(e) {
+    toast('❌ ' + e.message, 'red');
+    btn.disabled = false; sp.style.display = 'none'; tx.textContent = 'Submit Details →';
+  }
+}
+
+function showSuccess(p, count) {
+  document.getElementById('form-sec').style.display = 'none';
+  document.getElementById('success-screen').style.display = 'block';
+  document.getElementById('s-det').innerHTML =
+    `<b>Name:</b> ${p.name}<br/>
+     <b>Reg No:</b> ${p.regno}<br/>
+     <b>Class:</b> ${p.dept} – Year ${p.year} – Sec ${p.section}<br/>
+     <b>Fields saved:</b> ${count} field(s)`;
+  [1,2,3].forEach(n => setDot(n, 'done'));
+  ['ln1','ln2'].forEach(id => document.getElementById(id).classList.add('done'));
+}
+
+function resetForm() {
+  document.getElementById('form-sec').style.display = 'block';
+  document.getElementById('success-screen').style.display = 'none';
+  ['f-name','f-regno'].forEach(id => document.getElementById(id).value = '');
+  ['f-dept','f-year','f-section'].forEach(id => document.getElementById(id).value = '');
+  document.querySelectorAll('[id^="fv"]').forEach(el => el.value = '');
+  document.querySelectorAll('.acc-body,.acc-chev,.item-fields,.item-block-chev').forEach(el => el.classList.remove('open'));
+  document.getElementById('sub-btn').disabled = false;
+  document.getElementById('spin').style.display = 'none';
+  document.getElementById('btxt').textContent = 'Submit Details →';
+  setDot(1,'active'); setDot(2,''); setDot(3,'');
+  ['ln1','ln2'].forEach(id => document.getElementById(id).classList.remove('done'));
+}
+
+function toast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + type;
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>
