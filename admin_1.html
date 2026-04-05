@@ -439,10 +439,10 @@ window.addEventListener('DOMContentLoaded', () => {
   if (sheets.length === 0) {
     // First time — show setup with 2 blank rows
     showSetup();
-    addSetupRow('I Year', '');
-    addSetupRow('II Year', '');
-    addSetupRow('III Year', '');
-    addSetupRow('IV Year', '');
+    addSetupRow('I', '');
+    addSetupRow('II', '');
+    addSetupRow('III', '');
+    addSetupRow('IV', '');
   } else {
     document.getElementById('setup').classList.add('gone');
     renderSheetList();
