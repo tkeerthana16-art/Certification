@@ -177,10 +177,10 @@ footer { text-align:center; padding:14px; font-size:11px; color:var(--muted); }
           <label>Year <span class="req">*</span></label>
           <div class="sel-wrap"><select id="f-year" onchange="onYearChange(this.value)">
             <option value="">Select</option>
-            <option value="I">I</option>
-            <option value="II">II</option>
-            <option value="III">III</option>
-            <option value="IV">IV</option>
+            <option value="I Year">I</option>
+            <option value="II Year">II</option>
+            <option value="III Year">III</option>
+            <option value="IV Year">IV</option>
           </select></div>
           <div class="emsg" id="e-year">Select year</div>
         </div>
@@ -252,8 +252,8 @@ function onYearChange(val) {
     API = ''; setConn(false); CONFIG = null;
     return;
   }
-  // Match "I" → "I Year", "II" → "II Year" etc.
-  const url = SHEET_MAP[val + ' Year'] || SHEET_MAP[val] || '';
+  // value is "I Year", "II Year" etc — matches admin labels exactly
+  const url = SHEET_MAP[val] || '';
   if (!url) {
     document.getElementById('dynamic-sections').innerHTML =
       '<p style="color:#dc2626;font-size:13px;text-align:center;">⚠️ This year is not configured yet. Contact your administrator.</p>';
