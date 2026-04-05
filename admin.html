@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Panel — CERTIFICATION Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0f1117; --surface: #1a1d27; --surface2: #22263a;
+  --border: #2e3250; --primary: #4f7fff; --accent: #e8a020;
+  --green: #22c55e; --red: #ef4444; --purple: #a78bfa;
+  --text: #e8eaf6; --muted: #7b82a6; --radius: 10px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* SETUP */
+#setup {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+  z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+#setup.gone { display: none; }
+.setup-box {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  padding: 36px 30px; max-width: 480px; width: 100%;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+}
+.setup-box h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+.setup-box p  { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+.setup-box label { font-size: 12px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px; }
+.setup-box input {
+  width: 100%; padding: 11px 13px; background: var(--surface2);
+  border: 1.5px solid var(--border); border-radius: 8px;
+  font-size: 13px; font-family: 'DM Mono', monospace; color: var(--text); outline: none;
+  margin-bottom: 8px; transition: border-color 0.2s;
+}
+.setup-box input:focus { border-color: var(--primary); }
+.setup-box input.ok  { border-color: var(--green); }
+.setup-box input.bad { border-color: var(--red); }
+.hint { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
+.hint.ok  { color: var(--green); }
+.hint.bad { color: var(--red); }
+.btn-primary {
+  width: 100%; padding: 12px; background: var(--primary); color: #fff;
+  border: none; border-radius: 8px; font-size: 14px; font-weight: 700;
+  font-family: 'DM Sans', sans-serif; cursor: pointer; transition: opacity 0.2s;
+}
+.btn-primary:hover    { opacity: 0.88; }
+.btn-primary:disabled { background: #374151; cursor: not-allowed; }
+
+/* HEADER */
+header {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 0 24px; display: flex; align-items: center; gap: 16px;
+  height: 60px; position: sticky; top: 0; z-index: 100;
+}
+.logo { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--text); }
+.logo span { color: var(--primary); }
+.badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; text-transform: uppercase; }
+.badge.admin { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+.hright { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.conn-pill {
+  display: flex; align-items: center; gap: 6px; cursor: pointer;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 20px; padding: 5px 12px; font-size: 11px; font-weight: 600; color: var(--muted);
+  transition: border-color 0.2s;
+}
+.conn-pill:hover { border-color: var(--primary); }
+.cdot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); }
+.cdot.on { background: var(--green); box-shadow: 0 0 0 3px rgba(34,197,94,0.2); }
+.btn-save-all {
+  padding: 8px 18px; background: var(--primary); color: #fff;
+  border: none; border-radius: 8px; font-size: 13px; font-weight: 700;
+  font-family: 'DM Sans', sans-serif; cursor: pointer; transition: opacity 0.2s;
+  display: flex; align-items: center; gap: 6px;
+}
+.btn-save-all:hover { opacity: 0.85; }
+.spin-sm { width:14px; height:14px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:rot 0.6s linear infinite; display:none; }
+@keyframes rot { to{transform:rotate(360deg)} }
+
+/* LAYOUT */
+.layout { display: flex; height: calc(100vh - 60px); }
+
+/* SIDEBAR */
+.sidebar {
+  width: 260px; flex-shrink: 0; background: var(--surface);
+  border-right: 1px solid var(--border); overflow-y: auto;
+  padding: 16px 12px;
+}
+.sidebar-title { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; padding: 0 8px 10px; }
+.sec-nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 10px; border-radius: 8px; cursor: pointer;
+  font-size: 13.5px; font-weight: 600; color: var(--muted);
+  transition: all 0.15s; margin-bottom: 2px;
+}
+.sec-nav-item:hover { background: var(--surface2); color: var(--text); }
+.sec-nav-item.active { background: rgba(79,127,255,0.12); color: var(--primary); }
+.sec-nav-item .ni { font-size: 18px; }
+.sidebar-divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+.sidebar-add {
+  width: 100%; padding: 9px;
+  background: transparent; border: 1.5px dashed var(--border);
+  border-radius: 8px; color: var(--muted); font-size: 12.5px; font-weight: 600;
+  font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s;
+}
+.sidebar-add:hover { border-color: var(--primary); color: var(--primary); }
+
+/* CONNECTION PANEL in sidebar */
+.conn-panel {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 14px 12px; margin-bottom: 14px;
+}
+.conn-panel-title {
+  font-size: 10px; font-weight: 700; color: var(--muted);
+  letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 6px;
+}
+.conn-panel-title .dot-sm { width:6px; height:6px; border-radius:50%; background:var(--red); flex-shrink:0; }
+.conn-panel-title .dot-sm.on { background:var(--green); box-shadow:0 0 0 2px rgba(34,197,94,0.2); }
+
+/* Multi-sheet list */
+.sheet-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 8px; }
+.sheet-entry {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 7px;
+  padding: 8px 9px; display: flex; flex-direction: column; gap: 5px;
+  transition: border-color 0.2s;
+}
+.sheet-entry.active-sheet { border-color: var(--primary); }
+.sheet-entry-top { display: flex; align-items: center; gap: 6px; }
+.sheet-dot { width:6px; height:6px; border-radius:50%; background:var(--red); flex-shrink:0; }
+.sheet-dot.on { background:var(--green); box-shadow:0 0 0 2px rgba(34,197,94,0.2); }
+.sheet-label-inp {
+  flex: 1; background: transparent; border: none; outline: none;
+  font-size: 12px; font-weight: 700; color: var(--text);
+  font-family: 'DM Sans', sans-serif; min-width: 0;
+}
+.sheet-label-inp::placeholder { color: var(--muted); font-weight: 400; }
+.btn-sheet-del {
+  width: 22px; height: 22px; border-radius: 5px; flex-shrink: 0;
+  background: rgba(239,68,68,0.1); color: var(--red);
+  border: none; cursor: pointer; font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.btn-sheet-del:hover { background: rgba(239,68,68,0.28); }
+.sheet-url-inp {
+  width: 100%; background: transparent; border: none; outline: none;
+  font-size: 10px; font-family: 'DM Mono', monospace; color: var(--muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  padding: 0;
+}
+.sheet-url-inp::placeholder { color: var(--muted); opacity: 0.6; }
+.sheet-entry-actions { display: flex; gap: 5px; }
+.btn-sheet-act {
+  flex: 1; padding: 5px 4px; border-radius: 5px; font-size: 10.5px; font-weight: 700;
+  font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.15s; border: none;
+  text-align: center;
+}
+.btn-sheet-connect { background: rgba(79,127,255,0.15); color: var(--primary); }
+.btn-sheet-connect:hover { background: rgba(79,127,255,0.28); }
+.btn-sheet-use { background: rgba(34,197,94,0.12); color: var(--green); }
+.btn-sheet-use:hover { background: rgba(34,197,94,0.25); }
+.btn-add-sheet {
+  width: 100%; padding: 7px; background: transparent;
+  border: 1.5px dashed var(--border); border-radius: 6px;
+  color: var(--muted); font-size: 11.5px; font-weight: 600;
+  font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s;
+  margin-top: 2px;
+}
+.btn-add-sheet:hover { border-color: var(--primary); color: var(--primary); }
+
+/* keep old class for compat */
+.conn-url-display { display: none; }
+.btn-change-url { display: none; }
+
+/* STUDENT PUSH PANEL */
+.push-panel {
+  background: rgba(34,197,94,0.06); border: 1px solid rgba(34,197,94,0.2);
+  border-radius: 8px; padding: 12px; margin-bottom: 14px;
+}
+.push-panel-title { font-size: 10px; font-weight: 700; color: var(--green); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+.push-panel p { font-size: 11px; color: var(--muted); line-height: 1.5; margin-bottom: 10px; }
+.btn-push {
+  width: 100%; padding: 8px; background: rgba(34,197,94,0.15); color: var(--green);
+  border: 1.5px solid rgba(34,197,94,0.3); border-radius: 6px;
+  font-size: 12px; font-weight: 700; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-push:hover { background: rgba(34,197,94,0.25); }
+.btn-push:disabled { opacity: 0.4; cursor: not-allowed; }
+.push-status { font-size: 11px; margin-top: 7px; text-align: center; min-height: 16px; }
+.push-status.ok  { color: var(--green); }
+.push-status.err { color: var(--red); }
+
+/* MAIN EDITOR */
+.editor { flex: 1; overflow-y: auto; padding: 24px; }
+.editor-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+}
+.editor-header h2 { font-size: 20px; font-weight: 700; }
+.editor-header .sec-icon { font-size: 28px; }
+.btn-sm {
+  padding: 6px 12px; border-radius: 7px; font-size: 12px; font-weight: 700;
+  font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.15s;
+  border: none;
+}
+.btn-add  { background: rgba(79,127,255,0.15); color: var(--primary); }
+.btn-add:hover  { background: rgba(79,127,255,0.28); }
+.btn-del  { background: rgba(239,68,68,0.12); color: var(--red); }
+.btn-del:hover  { background: rgba(239,68,68,0.25); }
+.btn-green { background: rgba(34,197,94,0.12); color: var(--green); }
+.btn-green:hover { background: rgba(34,197,94,0.25); }
+
+/* ITEM CARD */
+.item-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); margin-bottom: 16px; overflow: hidden;
+}
+.item-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px; cursor: pointer; user-select: none;
+  transition: background 0.15s;
+}
+.item-header:hover { background: var(--surface2); }
+.item-label-input {
+  flex: 1; background: transparent; border: none; outline: none;
+  font-size: 14px; font-weight: 700; color: var(--text);
+  font-family: 'DM Sans', sans-serif; cursor: text;
+}
+.item-label-input:focus { color: var(--primary); }
+.chevron { transition: transform 0.25s; color: var(--muted); font-size: 14px; }
+.chevron.open { transform: rotate(90deg); }
+.item-body { display: none; padding: 0 16px 16px; border-top: 1px solid var(--border); }
+.item-body.open { display: block; }
+
+/* FIELD ROW */
+.field-row {
+  display: grid; grid-template-columns: 1fr 1fr 80px 80px 36px;
+  gap: 8px; align-items: center; margin-top: 10px;
+}
+.field-row input, .field-row select {
+  background: var(--surface2); border: 1.5px solid var(--border);
+  border-radius: 7px; padding: 8px 10px;
+  font-size: 12.5px; font-family: 'DM Sans', sans-serif; color: var(--text);
+  outline: none; transition: border-color 0.2s; width: 100%;
+  -webkit-appearance: none; appearance: none;
+}
+.field-row input:focus, .field-row select:focus { border-color: var(--primary); }
+.field-row .col-badge {
+  background: rgba(232,160,32,0.15); color: var(--accent);
+  border: 1px solid rgba(232,160,32,0.3); border-radius: 6px;
+  padding: 8px 6px; font-size: 12px; font-weight: 700;
+  font-family: 'DM Mono', monospace; text-align: center; text-transform: uppercase;
+}
+.field-row .del-field {
+  width: 32px; height: 32px; border-radius: 7px;
+  background: rgba(239,68,68,0.1); color: var(--red);
+  border: none; cursor: pointer; font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.field-row .del-field:hover { background: rgba(239,68,68,0.25); }
+.field-row-header {
+  display: grid; grid-template-columns: 1fr 1fr 80px 80px 36px;
+  gap: 8px; margin-top: 14px; margin-bottom: 2px;
+}
+.field-row-header span { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; padding-left: 2px; }
+.add-field-btn {
+  margin-top: 10px; width: 100%; padding: 8px;
+  background: transparent; border: 1.5px dashed var(--border);
+  border-radius: 7px; color: var(--muted); font-size: 12px; font-weight: 600;
+  font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s;
+}
+.add-field-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+/* SECTION EDIT BAR */
+.sec-edit-bar {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 16px; margin-bottom: 20px;
+}
+.sec-edit-bar input {
+  flex: 1; background: transparent; border: none; outline: none;
+  font-size: 14px; font-weight: 600; color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+}
+.icon-input {
+  width: 48px; background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 7px; padding: 7px; font-size: 20px; text-align: center;
+  outline: none; cursor: text;
+}
+
+.setup-row {
+  display: grid; grid-template-columns: 130px 1fr 32px;
+  gap: 8px; align-items: center; margin-bottom: 10px;
+}
+.setup-row input {
+  width: 100%; padding: 10px 12px; background: var(--surface2);
+  border: 1.5px solid var(--border); border-radius: 8px;
+  font-size: 12px; font-family: 'DM Mono', monospace; color: var(--text);
+  outline: none; transition: border-color 0.2s; margin-bottom: 0;
+}
+.setup-row input.label-inp { font-family: 'DM Sans', sans-serif; font-weight: 600; }
+.setup-row input:focus { border-color: var(--primary); }
+.setup-row input.ok  { border-color: var(--green); }
+.setup-row input.bad { border-color: var(--red); }
+.btn-row-del {
+  width: 32px; height: 38px; border-radius: 7px; flex-shrink: 0;
+  background: rgba(239,68,68,0.1); color: var(--red);
+  border: none; cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+.btn-row-del:hover { background: rgba(239,68,68,0.25); }
+.setup-col-heads {
+  display: grid; grid-template-columns: 130px 1fr 32px;
+  gap: 8px; margin-bottom: 6px;
+}
+.setup-col-heads span { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 20px; right: 20px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 18px;
+  font-size: 13px; font-weight: 500; z-index: 9999;
+  transform: translateY(60px); opacity: 0;
+  transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.ok  { border-color: var(--green); color: var(--green); }
+.toast.err { border-color: var(--red);   color: var(--red);   }
+
+@media(max-width:640px){
+  .sidebar { width: 200px; }
+  .field-row { grid-template-columns: 1fr 1fr 60px 60px 32px; }
+  .field-row-header { grid-template-columns: 1fr 1fr 60px 60px 32px; }
+}
+</style>
+</head>
+<body>
+
+<!-- SETUP OVERLAY -->
+<div id="setup">
+  <div class="setup-box" style="max-width:560px;">
+    <h2>🔧 Admin Setup — All Batches</h2>
+    <p>Add all your batch sheets here. You only do this once. After saving, this screen never appears again unless you reset.</p>
+
+    <div id="setup-rows"></div>
+
+    <button class="btn-primary" onclick="addSetupRow()"
+      style="background:transparent;border:1.5px dashed var(--border);color:var(--muted);margin-bottom:14px;">
+      + Add Another Batch
+    </button>
+
+    <button class="btn-primary" id="setup-btn" onclick="saveSetupAndLoad()">
+      ✅ Save All &amp; Open Admin
+    </button>
+    <div style="font-size:11px;color:var(--muted);margin-top:10px;text-align:center;">
+      You can add/edit batch URLs anytime from the sidebar.
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">DEPARTMENT OF TRAINING <span style="color:var(--primary)"> · Data Collection</span></div>
+  <span class="badge admin">Admin Panel</span>
+  <div class="hright">
+    <div class="conn-pill" onclick="showSetup()">
+      <div class="cdot" id="cdot"></div>
+      <span id="clbl">Not connected</span>
+    </div>
+    <button class="btn-save-all" onclick="saveAll()">
+      <div class="spin-sm" id="save-spin"></div>
+      <span id="save-txt">💾 Save All Changes</span>
+    </button>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <div class="sidebar">
+
+    <!-- CONNECTION STATUS PANEL — Multi-sheet -->
+    <div class="conn-panel">
+      <div class="conn-panel-title">
+        <div class="dot-sm" id="sidebar-dot"></div>
+        Google Sheets
+      </div>
+      <div class="sheet-list" id="sheet-list"></div>
+      <button class="btn-add-sheet" onclick="addSheetEntry()">+ Add Sheet</button>
+    </div>
+
+    <!-- HOW TO DEPLOY -->
+    <div class="push-panel">
+      <div class="push-panel-title">📋 How it works</div>
+      <p>
+        ✅ <strong>Save All Changes</strong> saves each batch's config to its own Google Sheet simultaneously.<br/><br/>
+        📲 Share the <strong>index.html</strong> GitHub Pages link with all students — they pick their year and submit directly to their batch's sheet from any device.
+      </p>
+    </div>
+
+    <div class="sidebar-title">Sections</div>
+    <div id="sec-nav"></div>
+    <hr class="sidebar-divider"/>
+    <button class="sidebar-add" onclick="addSection()">+ Add Section</button>
+  </div>
+
+  <div class="editor" id="editor">
+    <div class="empty">
+      <div class="ei">⚙️</div>
+      <p>Connect to your Google Sheet to<br/>load and edit your portal configuration.</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────
+// sheets = [{ id, label, url, config:{sections:[]} }]
+// Setup screen shows ONCE (first time). After that, goes straight to admin.
+let sheets        = JSON.parse(localStorage.getItem('nasscom_sheets') || '[]');
+let activeSheetId = null;
+let activeSecIdx  = 0;
+
+function getSheet(id)   { return sheets.find(x => x.id === id); }
+function activeSheet()  { return getSheet(activeSheetId); }
+function activeConfig() { const s = activeSheet(); return s ? (s.config || (s.config={sections:[]})) : {sections:[]}; }
+function saveSheets()   { localStorage.setItem('nasscom_sheets', JSON.stringify(sheets)); }
+
+// ── BOOT ───────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  sheets.forEach(s => { if (!s.config) s.config = {sections:[]}; });
+
+  if (sheets.length === 0) {
+    // First time — show setup with 2 blank rows
+    showSetup();
+    addSetupRow('I Year', '');
+    addSetupRow('II Year', '');
+    addSetupRow('III Year', '');
+    addSetupRow('IV Year', '');
+  } else {
+    document.getElementById('setup').classList.add('gone');
+    renderSheetList();
+    setConn(true);
+    const first = sheets[0];
+    if (first) loadFromSheet(first.id);
+  }
+});
+
+// ── SETUP OVERLAY ──────────────────────────────────────────────
+let setupRowCount = 0;
+
+function showSetup() {
+  document.getElementById('setup').classList.remove('gone');
+  // Pre-fill rows from existing sheets if any
+  const container = document.getElementById('setup-rows');
+  if (sheets.length > 0 && container.children.length === 0) {
+    // Add column headers
+    const heads = document.createElement('div');
+    heads.className = 'setup-col-heads';
+    heads.innerHTML = '<span>Batch Name</span><span>Apps Script URL</span><span></span>';
+    container.before(heads);
+    sheets.forEach(s => addSetupRow(s.label, s.url));
+  } else if (container.children.length === 0) {
+    const heads = document.createElement('div');
+    heads.className = 'setup-col-heads';
+    heads.innerHTML = '<span>Batch Name</span><span>Apps Script URL</span><span></span>';
+    container.before(heads);
+  }
+}
+
+function addSetupRow(label='', url='') {
+  const container = document.getElementById('setup-rows');
+  // Add headers if not present
+  const existing = document.querySelector('.setup-col-heads');
+  if (!existing) {
+    const heads = document.createElement('div');
+    heads.className = 'setup-col-heads';
+    heads.innerHTML = '<span>Batch Name</span><span>Apps Script URL</span><span></span>';
+    container.before(heads);
+  }
+  const id = 'sr_' + (++setupRowCount);
+  const row = document.createElement('div');
+  row.className = 'setup-row';
+  row.id = id;
+  row.innerHTML = `
+    <input class="label-inp" type="text" placeholder="e.g. II Year" value="${label}" />
+    <input type="text" placeholder="https://script.google.com/macros/s/…/exec"
+      value="${url}" spellcheck="false"
+      oninput="validateSetupUrl(this)" />
+    <button class="btn-row-del" onclick="document.getElementById('${id}').remove()">×</button>`;
+  container.appendChild(row);
+}
+
+function validateSetupUrl(inp) {
+  const v = inp.value.trim();
+  if (!v) { inp.className=''; return; }
+  const ok = v.startsWith('https://script.google.com/macros/s/') && v.endsWith('/exec');
+  inp.className = ok ? 'ok' : 'bad';
+}
+
+function saveSetupAndLoad() {
+  const rows = document.querySelectorAll('.setup-row');
+  const newSheets = [];
+  let hasError = false;
+
+  rows.forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const label  = inputs[0].value.trim();
+    const url    = inputs[1].value.trim();
+    if (!label && !url) return; // skip blank rows
+    if (!label) { toast('⚠️ Give a name to every batch', 'err'); hasError = true; return; }
+    if (!url)   { toast(`⚠️ "${label}" has no URL yet — add it later from sidebar`, ''); }
+    if (url && (!url.startsWith('https://script.google.com/macros/s/') || !url.endsWith('/exec'))) {
+      toast(`❌ "${label}" URL is invalid`, 'err'); hasError = true; return;
+    }
+    // Reuse existing sheet id if same label
+    const existing = sheets.find(s => s.label === label);
+    newSheets.push({
+      id:     existing ? existing.id : 'sheet_' + Date.now() + '_' + newSheets.length,
+      label,
+      url,
+      config: existing ? (existing.config || {sections:[]}) : {sections:[]}
+    });
+  });
+
+  if (hasError) return;
+  if (newSheets.length === 0) { toast('⚠️ Add at least one batch', 'err'); return; }
+
+  sheets = newSheets;
+  saveSheets();
+  document.getElementById('setup').classList.add('gone');
+  renderSheetList();
+  setConn(sheets.some(s => s.url));
+
+  // Auto-load first sheet that has a URL
+  const first = sheets.find(s => s.url);
+  if (first) loadFromSheet(first.id);
+  else {
+    activeSheetId = sheets[0].id;
+    renderAll();
+    toast('✅ Batches saved! Add URLs later to connect sheets.', 'ok');
+  }
+}
+
+// ── SIDEBAR SHEET LIST ─────────────────────────────────────────
+function renderSheetList() {
+  const list = document.getElementById('sheet-list');
+  if (!list) return;
+  if (!sheets.length) {
+    list.innerHTML = `<div style="font-size:11px;color:var(--muted);text-align:center;padding:6px 0;">No batches yet.</div>`;
+    return;
+  }
+  list.innerHTML = sheets.map(s => {
+    const hasUrl = !!s.url;
+    return `
+    <div class="sheet-entry" id="se-${s.id}">
+      <div class="sheet-entry-top">
+        <div class="sheet-dot ${hasUrl ? 'on' : ''}"></div>
+        <span style="font-size:12px;font-weight:700;color:var(--text);">${s.label}</span>
+      </div>
+      <div class="sheet-entry-actions" style="margin-top:5px;">
+        <button class="btn-sheet-act btn-sheet-connect" onclick="loadFromSheet('${s.id}')" ${!hasUrl ? 'disabled style="opacity:0.4"' : ''}>
+          📂 Edit Config
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addSheetEntry() { showSetup(); }
+
+// ── LOAD THIS SHEET'S CONFIG INTO EDITOR ──────────────────────
+function loadFromSheet(id) {
+  const s = getSheet(id);
+  if (!s) return;
+  if (!s.url) {
+    activeSheetId = id;
+    activeSecIdx  = 0;
+    renderSheetList();
+    renderAll();
+    toast(`ℹ️ "${s.label}" has no URL — editing local config only`, '');
+    return;
+  }
+  activeSheetId = id;
+  activeSecIdx  = 0;
+  renderSheetList();
+  document.getElementById('editor').innerHTML =
+    `<div class="empty"><div class="ei">⏳</div><p>Loading <strong>${s.label}</strong>…</p></div>`;
+
+  fetch(s.url + '?action=getConfig')
+    .then(r => r.json())
+    .then(data => {
+      if (data.status !== 'ok') throw new Error(data.message);
+      s.config = data.config || {sections:[]};
+      saveSheets();
+      renderAll();
+      toast(`✅ Loaded "${s.label}"`, 'ok');
+    })
+    .catch(e => {
+      // Still let admin edit — just use cached local config
+      renderAll();
+      toast(`⚠️ Could not fetch "${s.label}" — showing cached config. (${e.message})`, 'err');
+    });
+}
+
+function setConn(yes) {
+  document.getElementById('cdot').className        = 'cdot'+(yes?' on':'');
+  document.getElementById('clbl').textContent      = yes ? 'Connected ✓' : 'Not connected';
+  document.getElementById('sidebar-dot').className = 'dot-sm'+(yes?' on':'');
+}
+
+// ── SAVE — each sheet gets its OWN config ──────────────────────
+async function saveAll() {
+  const withUrl = sheets.filter(s => s.url);
+  if (!withUrl.length) { toast('⚠️ No sheets with URLs to save to', 'err'); return; }
+
+  const btn = document.getElementById('save-txt');
+  const sp  = document.getElementById('save-spin');
+  btn.textContent = 'Saving…'; sp.style.display = 'block';
+
+  const results = await Promise.allSettled(
+    withUrl.map(s =>
+      fetch(s.url, { method:'POST', body: JSON.stringify({ action:'saveConfig', config: s.config||{sections:[]} }) })
+        .then(r => r.json())
+        .then(d => { if (d.status!=='ok') throw new Error(d.message); return s.label; })
+    )
+  );
+
+  btn.textContent = '💾 Save All Changes'; sp.style.display = 'none';
+  const saved  = results.filter(r => r.status==='fulfilled').map(r => r.value);
+  const failed = results.filter(r => r.status==='rejected').length;
+
+  if (!failed)        toast(`✅ Saved: ${saved.join(', ')}`, 'ok');
+  else if (saved.length) toast(`⚠️ Saved ${saved.length}, failed ${failed}`, 'err');
+  else               toast('❌ Save failed for all sheets', 'err');
+}
+
+// ── RENDER ─────────────────────────────────────────────────────
+function renderAll() { renderNav(); renderEditor(activeSecIdx); }
+
+function renderNav() {
+  const nav = document.getElementById('sec-nav');
+  nav.innerHTML = '';
+  const cfg = activeConfig();
+  cfg.sections.forEach((sec, i) => {
+    const d = document.createElement('div');
+    d.className = 'sec-nav-item' + (i===activeSecIdx?' active':'');
+    d.innerHTML = `<span class="ni">${sec.icon||'📁'}</span> ${sec.label||'Untitled'}`;
+    d.onclick = () => { activeSecIdx = i; renderAll(); };
+    nav.appendChild(d);
+  });
+}
+
+function renderEditor(idx) {
+  const editor = document.getElementById('editor');
+  const cfg    = activeConfig();
+  if (!activeSheetId) {
+    editor.innerHTML = `<div class="empty"><div class="ei">👈</div><p>Click <strong>📂 Edit Config</strong><br/>on a batch to start editing.</p></div>`;
+    return;
+  }
+  if (!cfg.sections.length) {
+    editor.innerHTML = `<div class="empty"><div class="ei">📋</div><p>No sections yet.<br/>Click "+ Add Section" to get started.</p></div>`;
+    return;
+  }
+  const sec = cfg.sections[idx];
+  if (!sec) return;
+  let html = `
+    <div class="editor-header">
+      <span class="sec-icon">${sec.icon||'📁'}</span>
+      <h2>${sec.label}</h2>
+      <div style="margin-left:auto;display:flex;gap:8px;">
+        <button class="btn-sm btn-add" onclick="addItem(${idx})">+ Add Item</button>
+        <button class="btn-sm btn-del" onclick="deleteSection(${idx})">🗑 Delete Section</button>
+      </div>
+    </div>
+    <div class="sec-edit-bar">
+      <input type="text" id="sec-icon-${idx}" class="icon-input" value="${sec.icon||'📁'}" oninput="sec_update(${idx},'icon',this.value)" title="Emoji icon"/>
+      <input type="text" placeholder="Section name" value="${sec.label||''}" oninput="sec_update(${idx},'label',this.value)"/>
+    </div>`;
+  (sec.items||[]).forEach((item, ii) => {
+    html += `
+    <div class="item-card" id="item-${idx}-${ii}">
+      <div class="item-header" onclick="toggleItem('body-${idx}-${ii}','chev-${idx}-${ii}')">
+        <span style="color:var(--muted);font-size:13px;">▶</span>
+        <span id="chev-${idx}-${ii}" class="chevron">›</span>
+        <input class="item-label-input" type="text" value="${item.label||''}" placeholder="Item name"
+          oninput="item_update(${idx},${ii},'label',this.value)" onclick="event.stopPropagation()"/>
+        <button class="btn-sm btn-del" onclick="event.stopPropagation();deleteItem(${idx},${ii})">🗑</button>
+      </div>
+      <div class="item-body" id="body-${idx}-${ii}">
+        <div class="field-row-header">
+          <span>Field Label</span><span>Input Type</span><span>Sheet Col</span><span>Preview</span><span></span>
+        </div>
+        ${(item.fields||[]).map((f,fi) => fieldRowHTML(idx,ii,fi,f)).join('')}
+        <button class="add-field-btn" onclick="addField(${idx},${ii})">+ Add Field</button>
+      </div>
+    </div>`;
+  });
+  editor.innerHTML = html;
+}
+
+function fieldRowHTML(si,ii,fi,f) {
+  const types = ['text','url','select','date','number'];
+  const opts  = types.map(t=>`<option value="${t}"${f.type===t?' selected':''}>${t}</option>`).join('');
+  return `
+  <div class="field-row" id="fr-${si}-${ii}-${fi}">
+    <input type="text" placeholder="Label" value="${f.label||''}" oninput="field_update(${si},${ii},${fi},'label',this.value)"/>
+    <select oninput="field_update(${si},${ii},${fi},'type',this.value)">${opts}</select>
+    <input type="text" placeholder="Col e.g. G" value="${f.col||''}" maxlength="3"
+      style="font-family:'DM Mono',monospace;text-transform:uppercase;"
+      oninput="field_update(${si},${ii},${fi},'col',this.value.toUpperCase())"/>
+    <div class="col-badge">${f.col||'—'}</div>
+    <button class="del-field" onclick="deleteField(${si},${ii},${fi})">×</button>
+  </div>`;
+}
+
+// ── MUTATORS ───────────────────────────────────────────────────
+function sec_update(si,key,val)           { activeConfig().sections[si][key]=val; saveSheets(); renderNav(); }
+function item_update(si,ii,key,val)       { activeConfig().sections[si].items[ii][key]=val; saveSheets(); }
+function field_update(si,ii,fi,key,val)   {
+  activeConfig().sections[si].items[ii].fields[fi][key]=val; saveSheets();
+  if(key==='col'){ const b=document.querySelector(`#fr-${si}-${ii}-${fi} .col-badge`); if(b) b.textContent=val||'—'; }
+}
+function addSection() {
+  if(!activeSheetId){ toast('⚠️ Select a batch first','err'); return; }
+  const cfg=activeConfig();
+  cfg.sections.push({id:'sec_'+Date.now(),label:'New Section',icon:'📁',items:[]});
+  activeSecIdx=cfg.sections.length-1; saveSheets(); renderAll();
+}
+function deleteSection(idx) {
+  if(!confirm('Delete this section?')) return;
+  activeConfig().sections.splice(idx,1);
+  activeSecIdx=Math.max(0,idx-1); saveSheets(); renderAll();
+}
+function addItem(si) {
+  const s=activeConfig().sections[si];
+  if(!s.items) s.items=[];
+  s.items.push({id:'item_'+Date.now(),label:'New Item',fields:[]});
+  saveSheets(); renderEditor(si);
+}
+function deleteItem(si,ii) {
+  if(!confirm('Delete this item?')) return;
+  activeConfig().sections[si].items.splice(ii,1); saveSheets(); renderEditor(si);
+}
+function addField(si,ii) {
+  const item=activeConfig().sections[si].items[ii];
+  if(!item.fields) item.fields=[];
+  item.fields.push({id:'f_'+Date.now(),label:'',type:'text',col:''});
+  saveSheets(); renderEditor(si);
+  setTimeout(()=>{
+    document.getElementById(`body-${si}-${ii}`)?.classList.add('open');
+    document.getElementById(`chev-${si}-${ii}`)?.classList.add('open');
+  },50);
+}
+function deleteField(si,ii,fi) {
+  activeConfig().sections[si].items[ii].fields.splice(fi,1); saveSheets(); renderEditor(si);
+}
+function toggleItem(bid,cid) {
+  document.getElementById(bid)?.classList.toggle('open');
+  document.getElementById(cid)?.classList.toggle('open');
+}
+
+// ── TOAST ──────────────────────────────────────────────────────
+function toast(msg,type='') {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+type;
+  setTimeout(()=>t.classList.add('show'),10);
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+</script>
+</body>
+</html>
